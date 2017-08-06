@@ -6,6 +6,7 @@ local rocket = {}
 local mrbombs = {}
 local settings = {}
 local lasers = {}
+local missles = {}
 
 local hitbox = {}
 
@@ -74,6 +75,15 @@ function _draw()
 	 hopper.facing = 0
 	end
 	
+	if(btnp(4) and hopper.alive == 1) then
+		m = {}
+		m.x = hopper.x
+		m.y = hopper.y-10
+		m.sprite = 40
+		
+		add(missles, m)
+	end
+	
 	if(btnp(5) and hopper.alive == 1) then
 		l= {}
 		l.x = hopper.x
@@ -122,6 +132,11 @@ function _draw()
 	for l in all(lasers) do
 		spr(l.sprite,l.x, l.y)
 		l.x += l.dx
+	end
+	
+	for m in all(missles) do 
+		spr(m.sprite, m.x, m.y)
+		m.y -= 3
 	end
 
 	for bomb in all(mrbombs) do
