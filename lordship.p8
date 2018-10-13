@@ -12,18 +12,18 @@ local t = 0 -- keep track of time
 function _init() 
  cls()
  palt(0, false) 
- 
+ sfx(6)
  state = "title"
 end
 
 function _update() 
  
- if(state == "title") then
- 		if(btnp(4)) then
- 			game_init()
- 			state = "play"
-		 end
- end
+	if(state == "title") then
+			if(btnp(4)) then
+				game_init()
+				state = "play"
+			end
+	end
 
 end
 
@@ -56,13 +56,25 @@ function _draw()
 
 	-- draw the bad guys
 	for b in all(badguys) do 
+		
 		spr(b.sprite, b.x, b.y)
-		b.y += 2
+
+		if(b.alive) then
+			b.y += 2
+		end
 
 		--- test if bad guys collide with player.
 		if(nbot2.y >= b.y and nbot2.y <= b.y+10 
-			and nbot2.x >= b.x and nbot2.x <= b.x+10) then
+			and nbot2.x >= b.x and nbot2.x <= b.x+10) and b.alive then
 			nbot2.sprite = 28
+			sfx(10)
+
+			if(nbot2.alive) then 
+				sfx(7)
+			end
+
+			nbot2.alive = false
+			
 		end
 
 		--- clean up uneeded bad guys
@@ -81,6 +93,7 @@ function _draw()
 			if(l.y >= b.y and l.y <= b.y+10 
 				and l.x >= b.x and l.x <= b.x+10) then
 				b.sprite = 35
+				b.alive = false
 			end
 		end
 
@@ -91,8 +104,11 @@ function _draw()
 	end
 
 
+	if(nbot2.alive == false) then
+		print("game over", 45, 45)
+		print("Press 'C' to try again", 20, 55)
+	end		
 	spr(nbot2.sprite, nbot2.x, nbot2.y)
-	
 end
 
 function generate_badguys()
@@ -105,13 +121,21 @@ function generate_badguys()
 	 b.x = start_col+(i*7)
 	 b.y = -50
 	 b.sprite = 20
-	 
+	 b.alive = true
+
 	 add(badguys, b)
  	end	
 end
 
 function move_ship()
 	d = 4.4
+
+	if(nbot2.alive == false) then
+		if(btnp(4)) then
+			game_init()
+		end
+		return
+	end
 	
 	if(btnp(0)) then
 		nbot2.x -= d
@@ -158,10 +182,16 @@ function game_init()
 	nbot2.x = 50
 	nbot2.y = 100
 	nbot2.sprite = 24
+	nbot2.alive = true
 
-	for i=1,100 do
-   		pset(rnd(100), rnd(100), 7)
- 	end	
+	lasers = {} -- init lasers
+	superlasers = {} -- init super lasers
+	badguys = {} -- init bad guys
+	t = 0
+
+	-- for i=1,100 do
+   	-- 	pset(rnd(100), rnd(100), 7)
+ 	-- end	
 end
 __gfx__
 0000000000000000000c00000000000000cccc00000cc0000000000088000088cc0000cc8808808800cccc00cc0cc0cc888c0000000000000000000000000000
@@ -252,7 +282,10 @@ __sfx__
 00010000163501635016350163501f3501f35021350233501f3502135021350233502335024350173501725015550155501355011550105501665014650236501f65016650166501665016650166501665016750
 0001000001150041500b1500b150191500515022150231502315023150211501c1501d1501b1500515012550125501255012550125501255012550125501255012550125501455016100141000b1000110001100
 00100000163501635016350163501635000000000001635000000000001935019350193501935019350193500000019350193501935018350183501835018350183501835018350233503f350273502f35038350
-001000000000014550145501455014550145501455000000000001355000000135500000013550000000000000000125500000000000000001255000000000000d55000000000001355000000000000000013550
+0010000000000145501455014550145501455014550115500f5500f5500f5501055014550165501555014550115500e55009550075500b5500f550145501a5500d50000000000001350000000000000000013500
+001000000000000000000000b5500b5500b5500b5500b5500b550000000c550000000000000000000000c55000000000000c5500000000000000000c5500000000000000000c5500000009550075500555004550
+00100000000000475005750077500875009750000000b750000000e750000001375000000000001775019750000001d7501f750000002175022750227502275022750227502275023750207501b7501875015750
+00100000136501d670296102a6001860006600026003360022600126000c600066000560002600016000c5000b5000a50014500095000b5000850007500015000650004500045000350002500000000000000000
 __music__
 00 01424344
 
