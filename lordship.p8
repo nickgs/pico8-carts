@@ -58,13 +58,38 @@ function _draw()
 	for b in all(badguys) do 
 		spr(b.sprite, b.x, b.y)
 		b.y += 2
+
+		--- test if bad guys collide with player.
+		if(nbot2.y >= b.y and nbot2.y <= b.y+10 
+			and nbot2.x >= b.x and nbot2.x <= b.x+10) then
+			nbot2.sprite = 28
+		end
+
+		--- clean up uneeded bad guys
+		if(b.y > 100) then
+			del(badguys,b)
+		end
 	end
 
 	-- draw our world.
 	for l in all(lasers) do 
 		spr(l.sprite, l.x, l.y)
 		l.y -= 3
+
+		-- test for collisions
+		for b in all(badguys) do
+			if(l.y >= b.y and l.y <= b.y+10 
+				and l.x >= b.x and l.x <= b.x+10) then
+				b.sprite = 35
+			end
+		end
+
+		-- cleanup lasers
+		if(l.y < 0) then
+			del(lasers, l)
+		end
 	end
+
 
 	spr(nbot2.sprite, nbot2.x, nbot2.y)
 	
@@ -86,7 +111,7 @@ function generate_badguys()
 end
 
 function move_ship()
-	d = 1.3
+	d = 4.4
 	
 	if(btnp(0)) then
 		nbot2.x -= d
